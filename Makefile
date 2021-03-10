@@ -126,7 +126,7 @@ help:
 	@echo "make install          # Download $(BUILD)/app.apk into your phone"
 
 android_tools:
-	(cd android_tools; make)
+	(cd android_tools; make install)
 
 # These target do not create any file in the filesystem.
 .PHONY: all emu install_emu install_phone clean clean-all help android_tools
