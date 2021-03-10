@@ -2,8 +2,7 @@
 JAVAC:=$(shell which javac)
 
 ifeq (,$(JAVAC))
-    $(error You have to have javac in your path!)
-    $(error Or specify "make JAVAC=/..../bin/javac")
+    $(error You have to have javac in your path! Or specify "make JAVAC=/..../bin/javac")
 endif
 
 SOURCES:=$(shell find src/main/java -name "*.java")
@@ -19,19 +18,38 @@ $(shell mkdir -p $(BUILD) $(BUILD_TOOLS))
 GENSRC:=$(BUILD)/generated-sources
 RJAVA:=$(GENSRC)/$(PACKAGE_DIR)/R.java
 
-ASDKROOT:=/usr/lib/android-sdk
-ASDKVER:=29.0.2
-ASDKV:=29
+# The android sdk root directory.
+ASDKROOT?=$(abspath ./android_tools/android-sdk)
 
+ifeq (,$(wildcard $(ASDKROOT)))
+   $(info No android-sdk found here: $(ASDKROOT))
+   $(info You can specify the location when building: "make ASDKROOT=/...../android-sdk")
+   $(error fail)
+endif
+
+# The android version we want to build against.
+ANDROID_BUILD_TOOLS_VERSION:=30.0.3
+ANDROID_VERSION:=android-30
+
+# The aapt tool is used to package the app and to generate the R.java resource file
+AAPT:=$(ASDKROOT)/build-tools/$(ANDROID_BUILD_TOOLS_VERSION)/aapt
+# The adb tool is used to install the app into a phone or an emulator.
 ADB:=$(ASDKROOT)/platform-tools/adb
-AAPT:=$(ASDKROOT)/build-tools/$(ASDKVER)/aapt
-DX:=$(ASDKROOT)/build-tools/$(ASDKVER)/dx
-ZIPALIGN:=$(ASDKROOT)/build-tools/$(ASDKVER)/zipalign
-APKSIGNER:=$(ASDKROOT)/build-tools/$(ASDKVER)/apksigner
-PLATFORM=$(ASDKROOT)/platforms/android-$(ASDKV)/android.jar
+# The apksigner tool signs the app package (apk) with the developer key.
+APKSIGNER:=$(ASDKROOT)/build-tools/$(ANDROID_BUILD_TOOLS_VERSION)/apksigner
+# The avdmanager can install emulators
+AVDMANAGER:=$(ASDKROOT)/tools/bin/avdmanager
+# The dx tool converts the class files into a more compressed dx file.
+DX:=$(ASDKROOT)/build-tools/$(ANDROID_BUILD_TOOLS_VERSION)/dx
+# The android.jar contains the whole of android Java library to be linked against.
+PLATFORM=$(ASDKROOT)/platforms/$(ANDROID_VERSION)/android.jar
+# The sdkmanager can install different android sdks
+SDKMANAGER:=$(ASDKROOT)/tools/bin/sdkmanager
+# The zipalign tool makes the app archive be of the right size to be signed.
+ZIPALIGN:=$(ASDKROOT)/build-tools/$(ANDROID_BUILD_TOOLS_VERSION)/zipalign
 
 ifeq (,$(wildcard $(PLATFORM)))
-    $(error You have to have an android sdk installed here $(PLATFORM))
+    $(error No android.jar found! Check your path: $(PLATFORM))
 endif
 
 UNALIGNED_APK:=$(BUILD)/app.unaligned.apk
@@ -68,11 +86,19 @@ $(SIGNED_APK): $(UNALIGNED_APK)
 	@echo "Signing apk"
 	$(AT)$(APKSIGNER) sign --ks debug.keystore --ks-pass "pass:123456" $(SIGNED_APK)
 
-emu:
-	adb install path/to/your_app.apk
+start_emulator:
 
-install:
-	adb -d install $(SIGNED_APK)
+create_emulator:
+	echo "no" | $(AVDMANAGER) --verbose create avd --force --name "generic_10" --package "system-images;android-30;default;x86" --tag "default" --abi "x86"
+
+list_emulators:
+	$(AT)$(AVDMANAGER) list
+
+install_emu:
+	$(ADB) install $(SIGNED_APK)
+
+install_phone:
+	$(ADB) -d install $(SIGNED_APK)
 
 XMQ_SOURCES:=$(wildcard $(BUILD_TOOLS)/xmq/src/main/cc/*)
 
@@ -87,13 +113,23 @@ $(BUILD_TOOLS)/xmq: $(XMQ_SOURCES)
 	$(AT)cp $(BUILD_TOOLS)/xmq_sources/build/xmq $@
 
 clean:
-	rm -rf $(BUILD)
+	@echo "Removing $(BUILD)"
+	@rm -rf $(BUILD)
 
 clean-all:
-	rm -rf $(BUILD) $(BUILD_TOOLS)
+	@echo "Removing $(BUILD) and $(BUILD_TOOLS)"
+	@rm -rf $(BUILD) $(BUILD_TOOLS)
+
+help:
+	@echo "make                  # Build the $(BUILD)/app.apk"
+	@echo "make start_emulator   # Start an Nexus 10 emulator"
+	@echo "make install          # Download $(BUILD)/app.apk into your phone"
+
+android_tools:
+	(cd android_tools; make)
 
 # These target do not create any file in the filesystem.
-.PHONY: all emu install clean clean-all
+.PHONY: all emu install_emu install_phone clean clean-all help android_tools
 
 # Disable all builtin rules makes debugging using "make -d" easier."
 MAKEFLAGS += --no-builtin-rules

@@ -2,8 +2,9 @@
 
 The easiest way to build an Android app from the command line on Ubuntu.
 
-First: `sudo apt install android-sdk`
-Then use sdkmanager to install latest platform, eg 29.
+First: `make android_tools`
+This will install a binary package with the sdkmanager, then use the sdkmanager to
+install remaining tools and an Android SDK.
 
 Then run `make` to build the build/app.apk
 
