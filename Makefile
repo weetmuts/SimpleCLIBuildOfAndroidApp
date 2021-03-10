@@ -57,6 +57,7 @@ SIGNED_APK:=$(BUILD)/app.apk
 
 all: $(SIGNED_APK)
 
+# Apply this pattern rule only for targets inside $(BUILD)/xml
 $(BUILD)/xml/%.xml: src/%.xmq $(BUILD_TOOLS)/xmq
 	@mkdir -p $$(dirname $@)
 	$(AT)$(BUILD_TOOLS)/xmq $< > $@
@@ -87,8 +88,10 @@ $(SIGNED_APK): $(UNALIGNED_APK)
 	$(AT)$(APKSIGNER) sign --ks debug.keystore --ks-pass "pass:123456" $(SIGNED_APK)
 
 start_emulator:
+# This is not yet working.
 
 create_emulator:
+# This is not working.
 	echo "no" | $(AVDMANAGER) --verbose create avd --force --name "generic_10" --package "system-images;android-30;default;x86" --tag "default" --abi "x86"
 
 list_emulators:
@@ -98,7 +101,7 @@ install_emu:
 	$(ADB) install $(SIGNED_APK)
 
 install_phone:
-	$(ADB) -d install $(SIGNED_APK)
+	$(AT)$(ADB) install --no-incremental $(SIGNED_APK)
 
 XMQ_SOURCES:=$(wildcard $(BUILD_TOOLS)/xmq/src/main/cc/*)
 
