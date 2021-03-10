@@ -1,7 +1,8 @@
 
 help:
 	@echo "Help"
-	@echo "make install # to install cli tools, build tools and sdk."
+	@echo "make install # to install cli tools, build tools and sdk for android-30."
+	@echo "make install_29 # also install android-29
 
 VER:=android-30
 BTVER:=30.0.3
@@ -22,4 +23,7 @@ install:
 	@echo Using bootstrap sdkmanager to sdk $(VER)
 	$(SDKMANAGER) "platforms;$(VER)"
 
-.PHONY: install
+install_29: install
+	$(SDKMANAGER) "platforms;android-29"
+
+.PHONY: install install_29

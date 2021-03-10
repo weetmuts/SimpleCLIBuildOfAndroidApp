@@ -131,6 +131,9 @@ help:
 android_tools:
 	(cd android_tools; make install)
 
+android_tools_29:
+	(cd android_tools; make install_29)
+
 # These target do not create any file in the filesystem.
 .PHONY: all emu install_emu install_phone clean clean-all help android_tools
 
