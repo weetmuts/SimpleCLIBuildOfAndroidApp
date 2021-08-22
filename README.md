@@ -12,6 +12,7 @@ Then run `make` to build the build/app.apk
 
 Then run `make install_phone` to send the apk to your USB connected android phone.
 
+
 ## Older versions of android.
 
 You can easily build against android-29 instead.
