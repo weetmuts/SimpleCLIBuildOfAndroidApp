@@ -2,7 +2,7 @@
 
 The easiest way to build an Android app from the command line on Ubuntu.
 
-First run `make android_tools`
+First run `(cd android_tools; make install)`
 
 This will install a binary package with the sdkmanager, then use the
 sdkmanager to install remaining Android tools and an Android SDK and
@@ -16,7 +16,7 @@ Then run `make install_phone` to send the apk to your USB connected android phon
 
 You can easily build against android-29 instead.
 
-First run `make android_tools_29` to get platform 29.
+First run `(cd android_tools; make install_29)` to get platform 29.
 
 Then run: `make BUILD=build29 ANDROID_VERSION=android-29`
 

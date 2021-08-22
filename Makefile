@@ -22,9 +22,17 @@ RJAVA:=$(GENSRC)/$(PACKAGE_DIR)/R.java
 ASDKROOT?=$(abspath ./android_tools/android-sdk)
 
 ifeq (,$(wildcard $(ASDKROOT)))
-   $(info No android-sdk found here: $(ASDKROOT))
-   $(info You can specify the location when building: "make ASDKROOT=/...../android-sdk")
-   $(error fail)
+    ifeq (,$(findstring android_tools,$(MAKECMDGOALS)))
+        ifneq (,$(ADSKROOT))
+            $(info No android-sdk found here: $(ASDKROOT))
+            $(info You can specify the location when building: "make ASDKROOT=/...../android-sdk")
+            $(error fail)
+        endif
+        $(info No android-sdk installed. Do: "cd android_tools; make install" for version 30.)
+        $(info Or do: "cd android_tools; make install_29" for a different android version.)
+        $(info Then run make again!)
+        $(error fail)
+   endif
 endif
 
 # The android version we want to build against.
@@ -127,12 +135,6 @@ help:
 	@echo "make                  # Build the $(BUILD)/app.apk"
 	@echo "make start_emulator   # Start an Nexus 10 emulator"
 	@echo "make install          # Download $(BUILD)/app.apk into your phone"
-
-android_tools:
-	(cd android_tools; make install)
-
-android_tools_29:
-	(cd android_tools; make install_29)
 
 # These target do not create any file in the filesystem.
 .PHONY: all emu install_emu install_phone clean clean-all help android_tools
