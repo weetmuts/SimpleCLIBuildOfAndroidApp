@@ -1,4 +1,4 @@
-# AndroidExperiments
+# A simple CLI build of an android app, just type make!
 
 The easiest way to build an Android app from the command line on Ubuntu.
 
