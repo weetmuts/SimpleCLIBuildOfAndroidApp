@@ -68,7 +68,7 @@ all: $(SIGNED_APK)
 # Apply this pattern rule only for targets inside $(BUILD)/xml
 $(BUILD)/xml/%.xml: src/%.xmq $(BUILD_TOOLS)/xmq
 	@mkdir -p $$(dirname $@)
-	$(AT)$(BUILD_TOOLS)/xmq $< > $@
+	$(AT)$(BUILD_TOOLS)/xmq $< to_xml > $@
 	@echo "Updated $@ from xmq source $<"
 
 $(RJAVA): $(BUILD)/xml/main/AndroidManifest.xml $(BUILD)/xml/main/res/values/strings.xml $(PLATFORM) $(AAPT)
@@ -115,13 +115,13 @@ XMQ_SOURCES:=$(wildcard $(BUILD_TOOLS)/xmq/src/main/cc/*)
 
 $(BUILD_TOOLS)/xmq: $(XMQ_SOURCES)
 	@echo "Cloning xmq from https://github.com/weetmuts/xmq"
-	$(AT)(cd $(BUILD_TOOLS); git clone https://github.com/weetmuts/xmq.git xmq_sources > /tmp/xmq_clone 2>&1 ; \
+	$(AT)(cd $(BUILD_TOOLS); git clone https://github.com/libxmq/xmq.git xmq_sources > /tmp/xmq_clone 2>&1 ; \
 		if [ "$$?" != "0" ]; then cat /tmp/xmq_clone ; fi)
 	@echo "Building xmq..."
-	$(AT)(cd $(BUILD_TOOLS)/xmq_sources; make > /tmp/xmq_build 2>&1 ; \
+	$(AT)(cd $(BUILD_TOOLS)/xmq_sources; ./configure ; make > /tmp/xmq_build 2>&1 ; \
         if [ "$$?" != "0" ]; then cat /tmp/xmq_build; fi)
 	@echo "Done building xmq."
-	$(AT)cp $(BUILD_TOOLS)/xmq_sources/build/xmq $@
+	$(AT)cp $(BUILD_TOOLS)/xmq_sources/build/*/release/xmq $@
 
 clean:
 	@echo "Removing $(BUILD)"
