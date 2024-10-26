@@ -29,7 +29,7 @@ ifeq (,$(wildcard $(ASDKROOT)))
             $(error fail)
         endif
         $(info No android-sdk installed. Do: "cd android_tools; make install" for version 30.)
-        $(info Or do: "cd android_tools; make install_29" for a different android version.)
+        $(info Or do: "cd android_tools; make install_34" for a different android version.)
         $(info Then run make again!)
         $(error fail)
    endif
