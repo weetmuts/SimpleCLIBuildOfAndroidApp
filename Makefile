@@ -68,7 +68,7 @@ all: $(SIGNED_APK)
 # Apply this pattern rule only for targets inside $(BUILD)/xml
 $(BUILD)/xml/%.xml: src/%.xmq $(BUILD_TOOLS)/xmq
 	@mkdir -p $$(dirname $@)
-	$(AT)$(BUILD_TOOLS)/xmq $< to_xml > $@
+	$(AT)$(BUILD_TOOLS)/xmq $< to-xml > $@
 	@echo "Updated $@ from xmq source $<"
 
 $(RJAVA): $(BUILD)/xml/main/AndroidManifest.xml $(BUILD)/xml/main/res/values/strings.xml $(PLATFORM) $(AAPT)
@@ -121,7 +121,7 @@ $(BUILD_TOOLS)/xmq: $(XMQ_SOURCES)
 	$(AT)(cd $(BUILD_TOOLS)/xmq_sources; ./configure ; make > /tmp/xmq_build 2>&1 ; \
         if [ "$$?" != "0" ]; then cat /tmp/xmq_build; fi)
 	@echo "Done building xmq."
-	$(AT)cp $(BUILD_TOOLS)/xmq_sources/build/*/release/xmq $@
+	$(AT)cp $(BUILD_TOOLS)/xmq_sources/build/default/release/xmq $@
 
 clean:
 	@echo "Removing $(BUILD)"
